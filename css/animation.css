@@ -1,0 +1,53 @@
+/* Scroll Reveal Animation */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
+}
+
+.scroll-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered transition delays can be added via JS or refined classes if needed, 
+   but for now checking visibility in JS loop is sufficient */
+
+/* Infinite Slider Animation */
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(calc(-300px * 2));
+        /* Move by 2 slides (pattern A, B) */
+    }
+}
+
+.slider-track {
+    animation: scroll 20s linear infinite;
+}
+
+.slider-track:hover {
+    animation-play-state: paused;
+}
+
+/* Float Animation for Icons */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.lectures .card:hover .icon-box img {
+    animation: float 2s ease-in-out infinite;
+}
