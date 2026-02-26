@@ -1,3 +1,12 @@
+// 카카오톡 ID 클립보드 복사
+function copyKakaoId() {
+    navigator.clipboard.writeText('minbluesky').then(() => {
+        const btn = document.querySelector('.kakao-copy-btn');
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 2000);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Mobile Menu Toggle
     const mobileMenu = document.getElementById('mobile-menu');

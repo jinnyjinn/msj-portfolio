@@ -534,6 +534,49 @@ img {
     font-size: 0.9rem;
 }
 
+/* Kakao Copy Button */
+.kakao-copy-btn {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-family: var(--font-body);
+    font-size: inherit;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.kakao-copy-btn:hover {
+    color: #FEE500; /* 카카오 노란색 */
+}
+
+.kakao-copy-btn::after {
+    content: '📋 복사';
+    position: absolute;
+    left: 50%;
+    bottom: 120%;
+    transform: translateX(-50%);
+    background: #FEE500;
+    color: #333;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.kakao-copy-btn:hover::after {
+    opacity: 1;
+}
+
+.kakao-copy-btn.copied::after {
+    content: '✓ 복사됨!';
+    opacity: 1;
+}
+
 /* Responsive */
 @media (max-width: 992px) {
     .hero-title {
