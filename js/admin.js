@@ -3,9 +3,10 @@
 // ─────────────────────────────────────────────
 
 const ADMIN_PW   = 'msj2026';   // 비밀번호 (여기서 변경하세요)
-const AUTH_KEY   = 'msj_admin_auth';
-const VIDEOS_KEY = 'msj_admin_videos';
-const CERTS_KEY  = 'msj_admin_certs';
+const AUTH_KEY    = 'msj_admin_auth';
+const VIDEOS_KEY  = 'msj_admin_videos';
+const CERTS_KEY   = 'msj_admin_certs';
+const PROFILE_KEY = 'msj_admin_profile';
 
 const CATEGORIES = ['진로·진학', '취업·커리어', '환경·안전', 'AI·디지털', '기타'];
 
@@ -113,6 +114,46 @@ function collectVideos() {
         title:   document.getElementById(`v-title-${i}`)?.value.trim() || '',
         embedId: extractYtId(document.getElementById(`v-url-${i}`)?.value || ''),
     }));
+}
+
+// ── 프로필 사진 ──────────────────────────────────
+
+let profileDataUrl = null;
+
+function loadProfileAdmin() {
+    const saved = localStorage.getItem(PROFILE_KEY);
+    if (saved) {
+        profileDataUrl = saved;
+        document.getElementById('profile-preview').src = saved;
+        document.getElementById('profile-preview').style.display = 'block';
+        document.getElementById('profile-status').textContent = '✅ 저장된 사진 있음';
+    }
+}
+
+function onProfileFileChange() {
+    const file = document.getElementById('profile-file').files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const MAX = 800;
+            let w = img.width, h = img.height;
+            if (w > MAX || h > MAX) {
+                if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                else       { w = Math.round(w * MAX / h); h = MAX; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            profileDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            document.getElementById('profile-preview').src = profileDataUrl;
+            document.getElementById('profile-preview').style.display = 'block';
+            document.getElementById('profile-status').textContent = '✅ 새 사진 선택됨 (저장 버튼을 눌러주세요)';
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
 // ── 렌더링: 자격증 (카테고리 포함) ──────────────
@@ -252,6 +293,11 @@ function saveAll() {
         return;
     }
     localStorage.setItem(CERTS_KEY, JSON.stringify(collected));
+
+    if (profileDataUrl) {
+        localStorage.setItem(PROFILE_KEY, profileDataUrl);
+    }
+
     showToast('✅ 저장 완료! 메인 페이지를 새로고침하면 반영됩니다.');
 }
 
@@ -259,6 +305,10 @@ function resetAll() {
     if (!confirm('모든 설정을 기본값으로 초기화할까요?')) return;
     localStorage.removeItem(VIDEOS_KEY);
     localStorage.removeItem(CERTS_KEY);
+    localStorage.removeItem(PROFILE_KEY);
+    profileDataUrl = null;
+    document.getElementById('profile-preview').style.display = 'none';
+    document.getElementById('profile-status').textContent = '사진 없음 (기본값 사용)';
     certs = DEFAULT_CERTS.map(c => ({ ...c }));
     renderVideos(DEFAULT_VIDEOS);
     renderCerts();
@@ -301,4 +351,5 @@ function initPanel() {
     renderVideos(loadVideos());
     certs = loadCerts().map(c => ({ ...c }));
     renderCerts();
+    loadProfileAdmin();
 }

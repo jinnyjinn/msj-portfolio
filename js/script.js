@@ -36,7 +36,14 @@ function loadAdminOverrides() {
         } catch (e) { console.warn('Admin videos parse error', e); }
     }
 
-    // 2. 자격증 갤러리
+    // 2. 프로필 사진
+    const profileRaw = localStorage.getItem('msj_admin_profile');
+    if (profileRaw) {
+        const img = document.getElementById('profile-img');
+        if (img) img.src = profileRaw;
+    }
+
+    // 3. 자격증 갤러리
     const certsRaw = localStorage.getItem('msj_admin_certs');
     if (certsRaw) {
         try {
