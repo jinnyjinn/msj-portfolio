@@ -128,12 +128,23 @@ function catOptions(selected) {
 
 function renderCerts() {
     document.getElementById('cert-list').innerHTML = certs.map((c, i) => {
-        const color = CAT_COLORS[c.category] || CAT_COLORS['기타'];
+        const color    = CAT_COLORS[c.category] || CAT_COLORS['기타'];
+        const isData   = c.url && c.url.startsWith('data:');
+        const previewSrc = c.url || '';
         return `
         <div class="cert-row" id="cert-row-${i}">
-            <input type="text" id="c-url-${i}"
-                   placeholder="이미지 URL (예: assets/images/credentials/cert1.jpg)"
-                   value="${escHtml(c.url)}" />
+            <div class="cert-url-wrap">
+                <input type="file" id="c-file-${i}" accept="image/*" style="display:none"
+                       onchange="onFileChange(${i})">
+                <button class="file-pick-btn" type="button"
+                        onclick="document.getElementById('c-file-${i}').click()">📁 파일</button>
+                <img id="c-preview-${i}" class="cert-preview${previewSrc ? ' visible' : ''}"
+                     src="${previewSrc}" alt="미리보기">
+                <input type="text" id="c-url-${i}"
+                       placeholder="파일 선택 또는 URL 입력"
+                       value="${isData ? '' : escHtml(c.url)}"
+                       ${isData ? 'data-is-data="1"' : ''} />
+            </div>
             <input type="text" id="c-alt-${i}"
                    placeholder="자격증명 (예: 환경교육사 2급)"
                    value="${escHtml(c.alt)}" />
@@ -143,6 +154,48 @@ function renderCerts() {
             <button class="remove-cert-btn" onclick="removeCert(${i})" title="삭제">✕</button>
         </div>`;
     }).join('');
+}
+
+/** 파일 선택 시 canvas로 압축 → base64 저장 */
+function onFileChange(i) {
+    const file = document.getElementById(`c-file-${i}`).files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const MAX = 1400;
+            let w = img.width, h = img.height;
+            if (w > MAX || h > MAX) {
+                if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                else       { w = Math.round(w * MAX / h); h = MAX; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
+            // URL 입력창: data URL은 표시하지 않고 data 속성으로만 보관
+            const urlInput = document.getElementById(`c-url-${i}`);
+            urlInput.value = '';
+            urlInput.placeholder = '✅ 파일 선택됨';
+            urlInput.dataset.isData = '1';
+            urlInput.dataset.dataUrl = dataUrl;
+
+            // 미리보기 표시
+            const preview = document.getElementById(`c-preview-${i}`);
+            preview.src = dataUrl;
+            preview.classList.add('visible');
+
+            // 자격증명 자동 입력 (비어있을 때)
+            const altInput = document.getElementById(`c-alt-${i}`);
+            if (!altInput.value) {
+                altInput.value = file.name.replace(/\.[^/.]+$/, '').replace(/^[\d_-]+/, '');
+            }
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
 function onCatChange(i) {
@@ -164,11 +217,18 @@ function removeCert(i) {
 }
 
 function collectCerts() {
-    return certs.map((_, i) => ({
-        url:      document.getElementById(`c-url-${i}`)?.value.trim() || '',
-        alt:      document.getElementById(`c-alt-${i}`)?.value.trim() || '',
-        category: document.getElementById(`c-cat-${i}`)?.value || '기타',
-    })).filter(c => c.url);
+    return certs.map((orig, i) => {
+        const urlEl = document.getElementById(`c-url-${i}`);
+        // 파일로 선택된 경우 dataset.dataUrl 사용, 아니면 텍스트 입력값
+        const url = (urlEl?.dataset.isData === '1' && urlEl.dataset.dataUrl)
+            ? urlEl.dataset.dataUrl
+            : (urlEl?.value.trim() || orig.url || '');
+        return {
+            url,
+            alt:      document.getElementById(`c-alt-${i}`)?.value.trim() || '',
+            category: document.getElementById(`c-cat-${i}`)?.value || '기타',
+        };
+    }).filter(c => c.url);
 }
 
 // ── 저장 / 초기화 ─────────────────────────────
