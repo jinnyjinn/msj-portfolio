@@ -125,7 +125,7 @@ function renderCerts() {
         return `
         <div class="cert-row" id="cert-row-${i}">
             <input type="text" id="c-url-${i}"
-                   placeholder="이미지 URL (예: assets/images/credentials/cert1.png)"
+                   placeholder="이미지 URL (예: assets/images/credentials/cert1.jpg)"
                    value="${escHtml(c.url)}" />
             <input type="text" id="c-alt-${i}"
                    placeholder="자격증명 (예: 환경교육사 2급)"
