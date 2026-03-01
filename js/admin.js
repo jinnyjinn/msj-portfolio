@@ -25,8 +25,15 @@ const DEFAULT_VIDEOS = [
 ];
 
 const DEFAULT_CERTS = [
-    { url: 'assets/images/credentials/cert1.png', alt: '자격증 1', category: '기타' },
-    { url: 'assets/images/credentials/cert2.png', alt: '자격증 2', category: '기타' },
+    { url: 'assets/images/credentials/방과후지도사1급.jpg',                          alt: '방과후지도사 1급',         category: '진로·진학'  },
+    { url: 'assets/images/credentials/직업체험프로그램 강사 2급.jpg',               alt: '직업체험프로그램 강사 2급', category: '취업·커리어' },
+    { url: 'assets/images/credentials/지속가능환경교육지도사자격증.jpg',             alt: '지속가능환경교육지도사',    category: '환경·안전'  },
+    { url: 'assets/images/credentials/환경교육사 3급자격증.jpg',                    alt: '환경교육사 3급',           category: '환경·안전'  },
+    { url: 'assets/images/credentials/AI강사자격증.jpg',                            alt: 'AI강사자격증',             category: 'AI·디지털'  },
+    { url: 'assets/images/credentials/AI콘텐츠제작전문가.jpg.png',                  alt: 'AI콘텐츠제작전문가',        category: 'AI·디지털'  },
+    { url: 'assets/images/credentials/디지털콘텐츠전문가2급.jpg',                   alt: '디지털콘텐츠전문가 2급',    category: 'AI·디지털'  },
+    { url: 'assets/images/credentials/인공지능(AI)교육전문가 자격증_20271231까지.jpg', alt: '인공지능(AI)교육전문가',  category: 'AI·디지털'  },
+    { url: 'assets/images/credentials/보육교사자격증2급.jpg',                       alt: '보육교사 2급',             category: '기타'       },
 ];
 
 // ── 유틸리티 ─────────────────────────────────
