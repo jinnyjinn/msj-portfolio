@@ -1,4 +1,55 @@
-// 카카오톡 ID 클립보드 복사
+// ── Admin Override ──────────────────────────────────────────────
+// localStorage에 저장된 관리자 데이터를 페이지에 반영
+function loadAdminOverrides() {
+    // 1. 강의 영상
+    const videosRaw = localStorage.getItem('msj_admin_videos');
+    if (videosRaw) {
+        try {
+            const videos = JSON.parse(videosRaw);
+            videos.forEach((v, i) => {
+                const iframe = document.getElementById(`video-iframe-${i + 1}`);
+                const label  = document.getElementById(`video-label-${i + 1}`);
+                if (iframe && v.embedId) {
+                    iframe.src   = `https://www.youtube.com/embed/${v.embedId}`;
+                    iframe.title = v.title || '';
+                }
+                if (label && v.title) label.textContent = v.title;
+            });
+        } catch (e) { console.warn('Admin videos parse error', e); }
+    }
+
+    // 2. 자격증 슬라이더
+    const certsRaw = localStorage.getItem('msj_admin_certs');
+    if (certsRaw) {
+        try {
+            const certs = JSON.parse(certsRaw).filter(c => c.url);
+            const track  = document.getElementById('cert-slider-track');
+            if (track && certs.length > 0) {
+                // 무한 슬라이드를 위해 3배 반복
+                const repeated = [...certs, ...certs, ...certs];
+                track.style.width = `calc(300px * ${repeated.length})`;
+                track.innerHTML   = repeated
+                    .map(c => `<div class="slide"><img src="${c.url}" alt="${c.alt || '자격증'}"></div>`)
+                    .join('');
+
+                // 애니메이션 offset을 인증서 수에 맞게 동적 재정의
+                let dynStyle = document.getElementById('cert-anim-override');
+                if (!dynStyle) {
+                    dynStyle    = document.createElement('style');
+                    dynStyle.id = 'cert-anim-override';
+                    document.head.appendChild(dynStyle);
+                }
+                dynStyle.textContent = `
+                    @keyframes scroll {
+                        0%   { transform: translateX(0); }
+                        100% { transform: translateX(calc(-300px * ${certs.length})); }
+                    }`;
+            }
+        } catch (e) { console.warn('Admin certs parse error', e); }
+    }
+}
+
+// ── 카카오톡 ID 클립보드 복사 ──────────────────────────────────
 function copyKakaoId() {
     navigator.clipboard.writeText('minbluesky').then(() => {
         const btn = document.querySelector('.kakao-copy-btn');
@@ -8,6 +59,9 @@ function copyKakaoId() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 0. 관리자 오버라이드 적용
+    loadAdminOverrides();
+
     // 1. Mobile Menu Toggle
     const mobileMenu = document.getElementById('mobile-menu');
     const navLinks = document.querySelector('.nav-links');
