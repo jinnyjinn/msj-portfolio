@@ -175,12 +175,14 @@ function onFileChange(i) {
             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
             const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
 
-            // URL 입력창: data URL은 표시하지 않고 data 속성으로만 보관
+            // certs 배열에 직접 저장 (re-render 시 유지됨)
+            certs[i].url = dataUrl;
+
+            // URL 입력창: data URL은 표시하지 않고 플래그만 표시
             const urlInput = document.getElementById(`c-url-${i}`);
             urlInput.value = '';
             urlInput.placeholder = '✅ 파일 선택됨';
             urlInput.dataset.isData = '1';
-            urlInput.dataset.dataUrl = dataUrl;
 
             // 미리보기 표시
             const preview = document.getElementById(`c-preview-${i}`);
@@ -204,31 +206,39 @@ function onCatChange(i) {
     sel.style.borderLeft = `3px solid ${color}`;
 }
 
+/** 현재 DOM 입력값을 certs 배열에 동기화 (re-render 전 필수 호출) */
+function syncCertsFromDom() {
+    certs = certs.map((orig, i) => {
+        const urlEl = document.getElementById(`c-url-${i}`);
+        // 파일 선택된 경우 certs 배열에 이미 dataUrl이 있으므로 그대로 유지
+        const url = (urlEl?.dataset.isData === '1')
+            ? orig.url
+            : (urlEl?.value.trim() || orig.url || '');
+        return {
+            url,
+            alt:      document.getElementById(`c-alt-${i}`)?.value.trim() || orig.alt || '',
+            category: document.getElementById(`c-cat-${i}`)?.value || orig.category || '기타',
+        };
+    });
+}
+
 function addCert() {
-    if (certs.length >= 6) { showToast('자격증은 최대 6개까지 추가할 수 있습니다.'); return; }
+    if (certs.length >= 12) { showToast('자격증은 최대 12개까지 추가할 수 있습니다.'); return; }
+    syncCertsFromDom();
     certs.push({ url: '', alt: '', category: '기타' });
     renderCerts();
     document.getElementById(`c-url-${certs.length - 1}`)?.focus();
 }
 
 function removeCert(i) {
+    syncCertsFromDom();
     certs.splice(i, 1);
     renderCerts();
 }
 
 function collectCerts() {
-    return certs.map((orig, i) => {
-        const urlEl = document.getElementById(`c-url-${i}`);
-        // 파일로 선택된 경우 dataset.dataUrl 사용, 아니면 텍스트 입력값
-        const url = (urlEl?.dataset.isData === '1' && urlEl.dataset.dataUrl)
-            ? urlEl.dataset.dataUrl
-            : (urlEl?.value.trim() || orig.url || '');
-        return {
-            url,
-            alt:      document.getElementById(`c-alt-${i}`)?.value.trim() || '',
-            category: document.getElementById(`c-cat-${i}`)?.value || '기타',
-        };
-    }).filter(c => c.url);
+    syncCertsFromDom();
+    return certs.filter(c => c.url);
 }
 
 // ── 저장 / 초기화 ─────────────────────────────
