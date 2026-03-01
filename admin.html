@@ -184,14 +184,15 @@
         /* ── Cert rows ── */
         .cert-row {
             display: grid;
-            grid-template-columns: 2fr 1fr auto;
+            grid-template-columns: 2fr 1.2fr 1fr auto;
             gap: 10px;
             align-items: center;
             padding: 10px 0;
             border-bottom: 1px solid var(--border);
         }
         .cert-row:last-child { border-bottom: none; }
-        .cert-row input {
+        .cert-row input,
+        .cert-row select {
             padding: 9px 12px;
             border: 1.5px solid var(--border);
             border-radius: 8px;
@@ -199,17 +200,12 @@
             font-family: inherit;
             outline: none;
             transition: border-color .2s;
+            background: #fff;
         }
-        .cert-row input:focus { border-color: var(--primary); }
+        .cert-row input:focus,
+        .cert-row select:focus { border-color: var(--primary); }
         .cert-row input::placeholder { color: #aaa; }
-        .cert-row .preview-img {
-            width: 48px;
-            height: 48px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            display: none;
-        }
+        .cert-row select { cursor: pointer; color: var(--text); }
         .remove-cert-btn {
             background: none;
             border: 1.5px solid var(--danger);
@@ -230,7 +226,7 @@
         .cert-list { margin-bottom: 16px; }
         .cert-header {
             display: grid;
-            grid-template-columns: 2fr 1fr auto;
+            grid-template-columns: 2fr 1.2fr 1fr auto;
             gap: 10px;
             padding-bottom: 8px;
             margin-bottom: 4px;
@@ -373,7 +369,8 @@
             <p class="section-desc">이미지 URL을 입력하세요. 로컬 경로(assets/images/...) 또는 외부 URL 모두 가능합니다. 최대 6개.</p>
             <div class="cert-header">
                 <span>이미지 URL</span>
-                <span>설명 (alt)</span>
+                <span>자격증명</span>
+                <span>분야</span>
                 <span></span>
             </div>
             <div class="cert-list" id="cert-list"></div>

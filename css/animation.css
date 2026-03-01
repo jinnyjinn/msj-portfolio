@@ -13,25 +13,6 @@
 /* Staggered transition delays can be added via JS or refined classes if needed, 
    but for now checking visibility in JS loop is sufficient */
 
-/* Infinite Slider Animation */
-@keyframes scroll {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(calc(-300px * 2));
-        /* Move by 2 slides (pattern A, B) */
-    }
-}
-
-.slider-track {
-    animation: scroll 20s linear infinite;
-}
-
-.slider-track:hover {
-    animation-play-state: paused;
-}
 
 /* Float Animation for Icons */
 @keyframes float {

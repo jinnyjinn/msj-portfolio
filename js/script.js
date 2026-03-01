@@ -1,3 +1,21 @@
+// ── 카테고리 색상 맵 ──────────────────────────────────────────
+const CAT_COLORS = {
+    '진로·진학': '#2E5CB8',
+    '취업·커리어': '#e07b2a',
+    '환경·안전': '#27ae60',
+    'AI·디지털': '#00C4B4',
+    '기타': '#888888',
+};
+
+function getCatColor(cat) {
+    return CAT_COLORS[cat] || CAT_COLORS['기타'];
+}
+
+function escHtml(str) {
+    return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 // ── Admin Override ──────────────────────────────────────────────
 // localStorage에 저장된 관리자 데이터를 페이지에 반영
 function loadAdminOverrides() {
@@ -18,35 +36,76 @@ function loadAdminOverrides() {
         } catch (e) { console.warn('Admin videos parse error', e); }
     }
 
-    // 2. 자격증 슬라이더
+    // 2. 자격증 갤러리
     const certsRaw = localStorage.getItem('msj_admin_certs');
     if (certsRaw) {
         try {
             const certs = JSON.parse(certsRaw).filter(c => c.url);
-            const track  = document.getElementById('cert-slider-track');
-            if (track && certs.length > 0) {
-                // 무한 슬라이드를 위해 3배 반복
-                const repeated = [...certs, ...certs, ...certs];
-                track.style.width = `calc(300px * ${repeated.length})`;
-                track.innerHTML   = repeated
-                    .map(c => `<div class="slide"><img src="${c.url}" alt="${c.alt || '자격증'}"></div>`)
-                    .join('');
-
-                // 애니메이션 offset을 인증서 수에 맞게 동적 재정의
-                let dynStyle = document.getElementById('cert-anim-override');
-                if (!dynStyle) {
-                    dynStyle    = document.createElement('style');
-                    dynStyle.id = 'cert-anim-override';
-                    document.head.appendChild(dynStyle);
-                }
-                dynStyle.textContent = `
-                    @keyframes scroll {
-                        0%   { transform: translateX(0); }
-                        100% { transform: translateX(calc(-300px * ${certs.length})); }
-                    }`;
+            const grid  = document.getElementById('cert-grid');
+            if (grid && certs.length > 0) {
+                grid.innerHTML = certs.map(c => {
+                    const cat   = c.category || '기타';
+                    const color = getCatColor(cat);
+                    return `
+                    <div class="cert-card" data-category="${escHtml(cat)}">
+                        <div class="cert-img-wrap">
+                            <img src="${escHtml(c.url)}" alt="${escHtml(c.alt || '자격증')}">
+                        </div>
+                        <div class="cert-card-info">
+                            <p class="cert-name">${escHtml(c.alt || '자격증')}</p>
+                            <span class="cert-badge" style="background:${color}">${escHtml(cat)}</span>
+                        </div>
+                    </div>`;
+                }).join('');
             }
         } catch (e) { console.warn('Admin certs parse error', e); }
     }
+}
+
+// ── 자격증 분야별 필터 탭 ────────────────────────────────────────
+function initCertFilter() {
+    const tabs = document.querySelectorAll('.cert-tab');
+
+    // 현재 그리드에 존재하는 카테고리만 탭 표시
+    function refreshTabVisibility() {
+        const cats = new Set(
+            [...document.querySelectorAll('.cert-card')].map(c => c.dataset.category)
+        );
+        tabs.forEach(tab => {
+            const cat = tab.dataset.category;
+            tab.style.display = (cat === '전체' || cats.has(cat)) ? '' : 'none';
+        });
+    }
+
+    function filterCards(cat) {
+        document.querySelectorAll('.cert-card').forEach(card => {
+            card.style.display = (cat === '전체' || card.dataset.category === cat) ? '' : 'none';
+        });
+    }
+
+    refreshTabVisibility();
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            filterCards(tab.dataset.category);
+        });
+    });
+
+    // 이미지 클릭 시 라이트박스
+    document.getElementById('cert-grid')?.addEventListener('click', e => {
+        const img = e.target.closest('.cert-img-wrap img');
+        if (!img) return;
+        const lb = document.getElementById('cert-lightbox');
+        document.getElementById('cert-lightbox-img').src = img.src;
+        lb.classList.add('open');
+    });
+}
+
+// ── 라이트박스 닫기 ──────────────────────────────────────────────
+function closeLightbox() {
+    document.getElementById('cert-lightbox')?.classList.remove('open');
 }
 
 // ── 카카오톡 ID 클립보드 복사 ──────────────────────────────────
@@ -59,8 +118,9 @@ function copyKakaoId() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 0. 관리자 오버라이드 적용
+    // 0. 관리자 오버라이드 적용 → 자격증 탭 필터 초기화
     loadAdminOverrides();
+    initCertFilter();
 
     // 1. Mobile Menu Toggle
     const mobileMenu = document.getElementById('mobile-menu');

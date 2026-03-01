@@ -153,19 +153,40 @@
         </div>
     </section>
 
-    <!-- Credentials Slider -->
+    <!-- Credentials Gallery -->
     <section id="credentials" class="section credentials">
         <div class="container">
-            <h3 class="section-title center-text scroll-reveal">Credentials & History</h3>
-            <div class="slider-container scroll-reveal">
-                <div class="slider-track" id="cert-slider-track">
-                    <!-- Duplicate slides for infinite effect handled in JS/CSS or manual duplication -->
-                    <div class="slide"><img src="assets/images/credentials/cert1.png" alt="Certificate"></div>
-                    <div class="slide"><img src="assets/images/credentials/cert2.png" alt="Certificate"></div>
-                    <div class="slide"><img src="assets/images/credentials/cert1.png" alt="Certificate"></div>
-                    <div class="slide"><img src="assets/images/credentials/cert2.png" alt="Certificate"></div>
-                    <div class="slide"><img src="assets/images/credentials/cert1.png" alt="Certificate"></div>
-                    <div class="slide"><img src="assets/images/credentials/cert2.png" alt="Certificate"></div>
+            <h3 class="section-title center-text scroll-reveal">Credentials &amp; History</h3>
+
+            <!-- 분야별 탭 -->
+            <div class="cert-tabs scroll-reveal">
+                <button class="cert-tab active" data-category="전체">전체</button>
+                <button class="cert-tab" data-category="진로·진학">📚 진로·진학</button>
+                <button class="cert-tab" data-category="취업·커리어">💼 취업·커리어</button>
+                <button class="cert-tab" data-category="환경·안전">🌿 환경·안전</button>
+                <button class="cert-tab" data-category="AI·디지털">💡 AI·디지털</button>
+                <button class="cert-tab" data-category="기타">📋 기타</button>
+            </div>
+
+            <!-- 자격증 그리드 -->
+            <div class="cert-grid scroll-reveal" id="cert-grid">
+                <div class="cert-card" data-category="기타">
+                    <div class="cert-img-wrap">
+                        <img src="assets/images/credentials/cert1.png" alt="자격증 1">
+                    </div>
+                    <div class="cert-card-info">
+                        <p class="cert-name">자격증 1</p>
+                        <span class="cert-badge" style="background:#888">기타</span>
+                    </div>
+                </div>
+                <div class="cert-card" data-category="기타">
+                    <div class="cert-img-wrap">
+                        <img src="assets/images/credentials/cert2.png" alt="자격증 2">
+                    </div>
+                    <div class="cert-card-info">
+                        <p class="cert-name">자격증 2</p>
+                        <span class="cert-badge" style="background:#888">기타</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -298,6 +319,12 @@
             <p>&copy; 2026 Min Sujin. All Rights Reserved.</p>
         </div>
     </footer>
+
+    <!-- 자격증 이미지 라이트박스 -->
+    <div class="cert-lightbox" id="cert-lightbox" onclick="closeLightbox()">
+        <span class="cert-lightbox-close" onclick="closeLightbox()">✕</span>
+        <img id="cert-lightbox-img" src="" alt="자격증 확대보기">
+    </div>
 
     <script src="js/script.js"></script>
 </body>
