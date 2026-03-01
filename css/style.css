@@ -370,6 +370,26 @@ img {
     transform: translateY(-10px);
 }
 
+/* 클릭 가능한 강의 카드 */
+.lectures .card[data-cert-category] {
+    cursor: pointer;
+}
+
+.lectures .card[data-cert-category]::after {
+    content: '자격증 보기 →';
+    display: block;
+    margin-top: 14px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    opacity: 0;
+    transition: opacity .25s;
+}
+
+.lectures .card[data-cert-category]:hover::after {
+    opacity: 1;
+}
+
 .icon-box {
     width: 80px;
     height: 80px;

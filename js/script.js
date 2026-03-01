@@ -117,10 +117,32 @@ function copyKakaoId() {
     });
 }
 
+// ── 강의 카드 → 자격증 탭 연동 ──────────────────────────────────
+function initLectureCardLinks() {
+    document.querySelectorAll('.lectures .card[data-cert-category]').forEach(card => {
+        card.addEventListener('click', () => {
+            const cat = card.dataset.certCategory;
+            const tab = document.querySelector(`.cert-tab[data-category="${cat}"]`);
+            if (!tab) return;
+
+            // 탭 활성화 및 필터 적용
+            document.querySelectorAll('.cert-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            document.querySelectorAll('.cert-card').forEach(c => {
+                c.style.display = (c.dataset.category === cat) ? '' : 'none';
+            });
+
+            // 자격증 섹션으로 스크롤
+            document.getElementById('credentials')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // 0. 관리자 오버라이드 적용 → 자격증 탭 필터 초기화
     loadAdminOverrides();
     initCertFilter();
+    initLectureCardLinks();
 
     // 1. Mobile Menu Toggle
     const mobileMenu = document.getElementById('mobile-menu');
